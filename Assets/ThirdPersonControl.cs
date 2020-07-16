@@ -20,10 +20,16 @@ public class ThirdPersonControl : MonoBehaviour
         float vertical = Input.GetAxisRaw("Vertical");
         //Debug.Log(horizontal.ToString() + vertical.ToString());
 
+        animator.SetFloat("Horizontal", horizontal);
+        animator.SetFloat("Vertical", vertical);
+        animator.SetFloat("Speed", speed* 0.75f);
+        animator.SetBool("Idle", (horizontal == 0 && vertical == 0));
+        //Debug.Log((horizontal == 0 && vertical == 0));
+
         float targetAngle = /*Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + */camera.eulerAngles.y;
-        //float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
        // transform.GetChild(0).localRotation = Quaternion.Euler(0f, targetAngle, 0f);
-        transform.localRotation = Quaternion.Euler(0f, targetAngle, 0f);
+        transform.localRotation = Quaternion.Euler(0f, angle, 0f);
 
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
         if (direction.magnitude >= 0.1f)
@@ -33,7 +39,7 @@ public class ThirdPersonControl : MonoBehaviour
             //controller.Move(moveDirection.normalized * speed * Time.deltaTime);
             //Vector3 moveVector = new Vector3(0f, moveTargetAngle, 0f) + Vector3.forward;
             //rigidbody.AddForce(moveDirection * speed * Time.deltaTime, ForceMode.VelocityChange);
-            transform.DOBlendableLocalMoveBy(moveDirection * speed * Time.deltaTime, 0f);
+            //transform.DOBlendableLocalMoveBy(moveDirection * speed * Time.deltaTime, 0f);
         }
 
         //jump
