@@ -8,17 +8,29 @@ public class ThirdPersonControl : MonoBehaviour
     public Transform camera;
     public Rigidbody rigidbody;
     public Animator animator;
+    public LayerMask layerMask;
 
     public float speed = 0.001f;
+    public float frontSpeedMultiplier = 1.25f;
+    public float animationTransmitionRate = 5.0f;
     public float turnSmoothTime = 0.01f;
     public float turnSmoothVelocity;
 
+    float horizontal;
+    float vertical;
+    float moveSpeed;    //speed after multiplier this frame
     // Update is called once per frame
     void Update()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        //Debug.Log(horizontal.ToString() + vertical.ToString());
+        moveSpeed = speed; // set to default
+
+        horizontal = Mathf.MoveTowards(horizontal, Input.GetAxisRaw("Horizontal") * 100f, animationTransmitionRate);
+        vertical = Mathf.MoveTowards(vertical, Input.GetAxisRaw("Vertical") * 100f, animationTransmitionRate);
+        if (Input.GetAxisRaw("Vertical") == 1)
+        {
+            moveSpeed *= frontSpeedMultiplier;
+        }
+        //Debug.Log("Horizontal:" + horizontal.ToString()+ ",Vertical:" + vertical.ToString());
 
         animator.SetFloat("Horizontal", horizontal);
         animator.SetFloat("Vertical", vertical);
@@ -38,8 +50,34 @@ public class ThirdPersonControl : MonoBehaviour
             Vector3 moveDirection = Quaternion.Euler(0f, moveTargetAngle, 0f) * Vector3.forward;
             //controller.Move(moveDirection.normalized * speed * Time.deltaTime);
             //Vector3 moveVector = new Vector3(0f, moveTargetAngle, 0f) + Vector3.forward;
-            //rigidbody.AddForce(moveDirection * speed * Time.deltaTime, ForceMode.VelocityChange);
-            //transform.DOBlendableLocalMoveBy(moveDirection * speed * Time.deltaTime, 0f);
+            //rigidbody.AddForce(moveDirection * moveSpeed * Time.deltaTime, ForceMode.VelocityChange);
+
+            ///CollideCheck Rasycast
+            RaycastHit hit;
+            RaycastHit hit2;
+            Vector3 origin = transform.position;
+            origin += Vector3.up * 0.25f;
+
+            Vector3 end;
+            end = origin + (moveDirection * moveSpeed * 0.15f);
+            Debug.Log("(" + moveDirection.x + "," + moveDirection.y + "," + moveDirection.z + ")");
+            if (Physics.Raycast(origin, moveDirection, out hit, moveSpeed * 0.15f, layerMask))
+            {
+                Debug.DrawLine(origin, end, Color.red);
+            }
+            else
+            {
+                Debug.DrawLine(origin, end, Color.green);
+                if (Physics.Raycast(end, Vector3.up, out hit2, 0.5f, layerMask))
+                {
+                    Debug.DrawLine(end, end + Vector3.up * 0.5f, Color.red);
+                }
+                else
+                {
+                    transform.DOBlendableLocalMoveBy(moveDirection * moveSpeed * Time.deltaTime, 0f);
+                    Debug.DrawLine(end, end + Vector3.up * 0.5f, Color.green);
+                }
+            }
         }
 
         //jump
