@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using Cinemachine;
+using Cinemachine.Utility;
 
 public class ThirdPersonControl : MonoBehaviour
 {
+    [Header("Object Parameters")]
     public Camera camera;
     public Rigidbody rigidbody;
     public Animator animator;
@@ -15,20 +17,35 @@ public class ThirdPersonControl : MonoBehaviour
     public CinemachineFreeLook freeLookCamera;
     public GameObject Reticle;
 
+    [Header("Float Parameters")]
     public float speed = 0.001f;
     public float frontSpeedMultiplier = 1.25f;
     public float horizontalSpeedMultiplier = 1.25f;
+    public float rollingSpeed = 3f;
     public float animationTransmitionRate = 5.0f;
     public float turnSmoothTime = 0.01f;
     public float turnSmoothVelocity;
     public float lockOnSearchRange = 20.0f;
     public float climbHeightMaximum = 0.25f;
     public float YaxisClimbLerpDelay = 3;   //The higher the value the smoothier it is but take more memory
+    public float lockOnCameraOffset = 0.15f;
+
+    [Header("Key Input Customization")]
+    public KeyCode Rolling = KeyCode.Space;
+    public KeyCode LockOn = KeyCode.Mouse2;
+    public KeyCode CameraSideLeft = KeyCode.Q;
+    public KeyCode CameraSideRight = KeyCode.E;
 
     float horizontal;
     float vertical;
     float moveSpeed;    //speed after multiplier this frame
+    float collisionCheckRange = 0.15f;
     bool lockOnMode = false;
+    float rollHorizontal;
+    float rollVertical;
+    Vector3 rollDirection;
+    CinemachineOrbitalTransposer[] orbital = new CinemachineOrbitalTransposer[3];
+    CinemachineVirtualCamera[] rigs = new CinemachineVirtualCamera[3];
 
     void Start()
     {
@@ -36,6 +53,12 @@ public class ThirdPersonControl : MonoBehaviour
         lockOnCamera.Priority = 0;
         freeLookCamera.Priority = 1;
         lockOnMode = false;
+
+        for (int i = 0; freeLookCamera != null && i < 3; ++i)
+        {
+            rigs[i] = freeLookCamera.GetRig(i);
+            orbital[i] = rigs[i].GetCinemachineComponent<CinemachineOrbitalTransposer>();
+        }
     }
 
     // Update is called once per frame
@@ -46,9 +69,17 @@ public class ThirdPersonControl : MonoBehaviour
         //input
         horizontal = Mathf.MoveTowards(horizontal, Input.GetAxisRaw("Horizontal") * 100f, animationTransmitionRate);
         vertical = Mathf.MoveTowards(vertical, Input.GetAxisRaw("Vertical") * 100f, animationTransmitionRate);
-        if (Input.GetMouseButtonDown(2)) //middle click
+        if (Input.GetKeyDown(LockOn)) //middle click
         {
             LockOnTriggered();
+        }
+        if (lockOnMode)
+        {
+            ChangeSideCamera(Input.GetKeyDown(CameraSideLeft), Input.GetKeyDown(CameraSideRight));
+        }
+        if (Input.GetKeyDown(Rolling))
+        {
+            Roll();
         }
 
         //Speed Modifier
@@ -61,10 +92,18 @@ public class ThirdPersonControl : MonoBehaviour
             moveSpeed *= frontSpeedMultiplier;
         }
 
+        //IsRoll
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Rolling Locomotion"))
+        {
+            //replace key input
+            horizontal = rollHorizontal;
+            vertical = rollVertical;
+        }
+
         //animation parameters
         animator.SetFloat("Horizontal", horizontal);
         animator.SetFloat("Vertical", vertical);
-        animator.SetFloat("Speed", speed* 0.75f);
+        animator.SetFloat("Speed", speed * 0.75f);
         animator.SetBool("Idle", (horizontal == 0 && vertical == 0));
 
         //rotate
@@ -82,20 +121,27 @@ public class ThirdPersonControl : MonoBehaviour
         }
 
         //jump
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            rigidbody.AddForce(Vector3.up * 3.5f, ForceMode.Impulse);
-        }
-    }
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    rigidbody.AddForce(Vector3.up * 3.5f, ForceMode.Impulse);
+        //}
 
-    void LateUpdate()
-    {
-        //move
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
+
+        //move
         if (direction.magnitude >= 0.1f)
         {
             float moveTargetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + camera.transform.eulerAngles.y;
             Vector3 moveDirection = Quaternion.Euler(0f, moveTargetAngle, 0f) * Vector3.forward;
+
+            //Rolling Replacement
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Rolling Locomotion")) //is rolling
+            {
+                //replace movespeed
+                moveSpeed = rollingSpeed;
+                //replace direction
+                moveDirection = rollDirection;
+            }
 
             ///CollideCheck Rasycast
             RaycastHit hit;
@@ -104,8 +150,8 @@ public class ThirdPersonControl : MonoBehaviour
             origin += Vector3.up * climbHeightMaximum;
 
             Vector3 end;
-            end = origin + (moveDirection * moveSpeed * 0.15f);
-            if (Physics.Raycast(origin, moveDirection, out hit, moveSpeed * 0.15f, layerMask))
+            end = origin + (moveDirection * collisionCheckRange);
+            if (Physics.Raycast(origin, moveDirection, out hit, collisionCheckRange, layerMask))
             {
                 Debug.DrawLine(origin, end, Color.red);
             }
@@ -123,6 +169,11 @@ public class ThirdPersonControl : MonoBehaviour
                 }
             }
         }
+    }
+
+    void LateUpdate()
+    {
+       
     }
 
     Transform FindTarget()
@@ -191,7 +242,8 @@ public class ThirdPersonControl : MonoBehaviour
                 freeLookCamera.Priority = 0;
                 lockOnMode = true;
 
-                
+                //set aiming target
+                lockOnCamera.LookAt = GetCameraFocusAvailable(lockOnTarget);
             }
         }
         else
@@ -199,21 +251,40 @@ public class ThirdPersonControl : MonoBehaviour
             //back to default
             lockOnCamera.Priority = 0;
             freeLookCamera.Priority = 1;
+            lockOnCamera.LookAt = null;
             lockOnTarget = null;
             lockOnMode = false;
 
             //reset free look camera's rotation
+            Transform target = freeLookCamera != null ? freeLookCamera.Follow : null;
+            if (target == null)
+                return;
         }
 
         //Canvas
         Reticle.SetActive(lockOnMode);
     }
 
+    bool ChangeSideCamera(bool leftside, bool rightside)
+    {
+        if (leftside)
+        {
+            lockOnCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ScreenX = 0.5f - lockOnCameraOffset;
+            return true;
+        }
+        else if (rightside)
+        {
+            lockOnCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ScreenX = 0.5f + lockOnCameraOffset;
+            return true;
+        }
+        return false;
+    }
+
     void Move(Vector3 moveDirection)
     {
         //check Y of new position
         RaycastHit hit;
-        Vector3 origin = transform.position + (moveDirection * moveSpeed * 0.15f);
+        Vector3 origin = transform.position + (moveDirection * collisionCheckRange);
         origin += Vector3.up * climbHeightMaximum;
         bool GroundHit = (Physics.Raycast(origin, Vector3.down, out hit, climbHeightMaximum, layerMask));
         
@@ -230,5 +301,47 @@ public class ThirdPersonControl : MonoBehaviour
         
         //move XZ
         transform.DOBlendableLocalMoveBy(moveDirection * moveSpeed * Time.deltaTime, 0f);
+    }
+
+    Transform GetCameraFocusAvailable(Transform parent)
+    {
+        Transform rtn = null;
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            if (parent.GetChild(i).gameObject.tag == "CameraFocus")
+            {
+                return parent.GetChild(i).gameObject.transform;
+                break;
+            }
+        }
+        return rtn;
+    }
+
+    void Roll()
+    {
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Rolling Locomotion"))
+        {
+            //already rolling
+            return;
+        }
+
+        rollHorizontal = Input.GetAxisRaw("Horizontal") * 100;
+        rollVertical = Input.GetAxisRaw("Vertical") * 100;
+        if (rollHorizontal == 0 && rollVertical == 0)
+        {
+            //default roll direction
+            rollVertical = 100;
+        }
+
+        //replace
+        horizontal = rollHorizontal;
+        vertical = rollVertical;
+
+        Vector3 direction = new Vector3(rollHorizontal, 0f, rollVertical).normalized;
+
+        float moveTargetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + camera.transform.eulerAngles.y;
+        rollDirection = Quaternion.Euler(0f, moveTargetAngle, 0f) * Vector3.forward;
+
+        animator.SetTrigger("Roll");
     }
 }
