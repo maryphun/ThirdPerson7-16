@@ -41,6 +41,7 @@ public class ThirdPersonControl : MonoBehaviour
     float moveSpeed;    //speed after multiplier this frame
     float collisionCheckRange = 0.15f;
     bool lockOnMode = false;
+    bool isRolling;
     float rollHorizontal;
     float rollVertical;
     Vector3 rollDirection;
@@ -60,8 +61,7 @@ public class ThirdPersonControl : MonoBehaviour
             orbital[i] = rigs[i].GetCinemachineComponent<CinemachineOrbitalTransposer>();
         }
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
         moveSpeed = speed; // set to default
@@ -135,12 +135,17 @@ public class ThirdPersonControl : MonoBehaviour
             Vector3 moveDirection = Quaternion.Euler(0f, moveTargetAngle, 0f) * Vector3.forward;
 
             //Rolling Replacement
-            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Rolling Locomotion")) //is rolling
+            if (isRolling)
             {
                 //replace movespeed
                 moveSpeed = rollingSpeed;
                 //replace direction
                 moveDirection = rollDirection;
+                //check if it should be ended
+                if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !animator.IsInTransition(0))
+                {
+                    isRolling = false;
+                }
             }
 
             ///CollideCheck Rasycast
@@ -150,8 +155,8 @@ public class ThirdPersonControl : MonoBehaviour
             origin += Vector3.up * climbHeightMaximum;
 
             Vector3 end;
-            end = origin + (moveDirection * collisionCheckRange);
-            if (Physics.Raycast(origin, moveDirection, out hit, collisionCheckRange, layerMask))
+            end = origin + (moveDirection * moveSpeed * collisionCheckRange);
+            if (Physics.Raycast(origin, moveDirection, out hit, moveSpeed * collisionCheckRange, layerMask))
             {
                 Debug.DrawLine(origin, end, Color.red);
             }
@@ -169,11 +174,6 @@ public class ThirdPersonControl : MonoBehaviour
                 }
             }
         }
-    }
-
-    void LateUpdate()
-    {
-       
     }
 
     Transform FindTarget()
@@ -284,7 +284,7 @@ public class ThirdPersonControl : MonoBehaviour
     {
         //check Y of new position
         RaycastHit hit;
-        Vector3 origin = transform.position + (moveDirection * collisionCheckRange);
+        Vector3 origin = transform.position + (moveSpeed * moveDirection * collisionCheckRange);
         origin += Vector3.up * climbHeightMaximum;
         bool GroundHit = (Physics.Raycast(origin, Vector3.down, out hit, climbHeightMaximum, layerMask));
         
@@ -298,9 +298,12 @@ public class ThirdPersonControl : MonoBehaviour
         {
             Debug.DrawLine(origin, origin + new Vector3(0.0f, -climbHeightMaximum, 0.0f), Color.blue);
         }
-        
+
         //move XZ
-        transform.DOBlendableLocalMoveBy(moveDirection * moveSpeed * Time.deltaTime, 0f);
+        if (!TooCloseToLockOnTarget(transform.position + moveDirection * moveSpeed * Time.deltaTime))
+        {
+            transform.DOBlendableLocalMoveBy(moveDirection * moveSpeed * Time.deltaTime, 0f);
+        }
     }
 
     Transform GetCameraFocusAvailable(Transform parent)
@@ -319,7 +322,7 @@ public class ThirdPersonControl : MonoBehaviour
 
     void Roll()
     {
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Rolling Locomotion"))
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Rolling Locomotion") || isRolling)
         {
             //already rolling
             return;
@@ -343,5 +346,23 @@ public class ThirdPersonControl : MonoBehaviour
         rollDirection = Quaternion.Euler(0f, moveTargetAngle, 0f) * Vector3.forward;
 
         animator.SetTrigger("Roll");
+        isRolling = true;
+    }
+
+    bool TooCloseToLockOnTarget(Vector3 newPos)
+    {
+        bool rtn = false;
+        
+        if (lockOnMode && lockOnTarget != null)
+        {
+            float newDistance = Vector3.Distance(newPos, lockOnTarget.position);
+            float oldDistance = Vector3.Distance(this.transform.position, lockOnTarget.position);
+            if (newDistance < speed/2f && newDistance < oldDistance && horizontal == 0f)
+            {
+                return true;
+            }
+        }
+
+        return rtn;
     }
 }
