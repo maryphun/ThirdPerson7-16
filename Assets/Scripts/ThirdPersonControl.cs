@@ -22,6 +22,7 @@ public class ThirdPersonControl : MonoBehaviour
     public float frontSpeedMultiplier = 1.25f;
     public float horizontalSpeedMultiplier = 1.25f;
     public float rollingSpeed = 3f;
+    public float rollingTime = 1.0f;
     public float animationTransmitionRate = 5.0f;
     public float turnSmoothTime = 0.01f;
     public float turnSmoothVelocity;
@@ -39,11 +40,10 @@ public class ThirdPersonControl : MonoBehaviour
     float horizontal;
     float vertical;
     float moveSpeed;    //speed after multiplier this frame
-    float collisionCheckRange = 0.15f;
+    float collisionCheckRange = 0.10f;
+    float rollingDelta;
     bool lockOnMode = false;
     bool isRolling;
-    float rollHorizontal;
-    float rollVertical;
     Vector3 rollDirection;
     CinemachineOrbitalTransposer[] orbital = new CinemachineOrbitalTransposer[3];
     CinemachineVirtualCamera[] rigs = new CinemachineVirtualCamera[3];
@@ -67,8 +67,12 @@ public class ThirdPersonControl : MonoBehaviour
         moveSpeed = speed; // set to default
 
         //input
-        horizontal = Mathf.MoveTowards(horizontal, Input.GetAxisRaw("Horizontal") * 100f, animationTransmitionRate);
-        vertical = Mathf.MoveTowards(vertical, Input.GetAxisRaw("Vertical") * 100f, animationTransmitionRate);
+        if (!isRolling)
+        {
+            horizontal = Mathf.MoveTowards(horizontal, Input.GetAxisRaw("Horizontal") * 100f, animationTransmitionRate);
+            vertical = Mathf.MoveTowards(vertical, Input.GetAxisRaw("Vertical") * 100f, animationTransmitionRate);
+            if (Input.GetKeyDown(Rolling)) Roll();
+        }
         if (Input.GetKeyDown(LockOn)) //middle click
         {
             LockOnTriggered();
@@ -76,10 +80,6 @@ public class ThirdPersonControl : MonoBehaviour
         if (lockOnMode)
         {
             ChangeSideCamera(Input.GetKeyDown(CameraSideLeft), Input.GetKeyDown(CameraSideRight));
-        }
-        if (Input.GetKeyDown(Rolling))
-        {
-            Roll();
         }
 
         //Speed Modifier
@@ -90,14 +90,6 @@ public class ThirdPersonControl : MonoBehaviour
         if (Input.GetAxisRaw("Horizontal") != 0 && Input.GetAxisRaw("Vertical") == 0)
         {
             moveSpeed *= frontSpeedMultiplier;
-        }
-
-        //IsRoll
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Rolling Locomotion"))
-        {
-            //replace key input
-            horizontal = rollHorizontal;
-            vertical = rollVertical;
         }
 
         //animation parameters
@@ -129,22 +121,28 @@ public class ThirdPersonControl : MonoBehaviour
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
         //move
-        if (direction.magnitude >= 0.1f)
+        if (direction.magnitude >= 0.1f || isRolling)
         {
-            float moveTargetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + camera.transform.eulerAngles.y;
-            Vector3 moveDirection = Quaternion.Euler(0f, moveTargetAngle, 0f) * Vector3.forward;
-
+            Vector3 moveDirection;
             //Rolling Replacement
-            if (isRolling)
+            if (!isRolling)
+            {
+                float moveTargetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + camera.transform.eulerAngles.y;
+                moveDirection = Quaternion.Euler(0f, moveTargetAngle, 0f) * Vector3.forward;
+            }
+            else
             {
                 //replace movespeed
                 moveSpeed = rollingSpeed;
                 //replace direction
                 moveDirection = rollDirection;
                 //check if it should be ended
-                if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1 && !animator.IsInTransition(0))
+
+                rollingDelta -= Time.deltaTime;
+                if (rollingDelta <= 0.0f)
                 {
                     isRolling = false;
+                    animator.SetTrigger("RollEnd");
                 }
             }
 
@@ -154,6 +152,7 @@ public class ThirdPersonControl : MonoBehaviour
             Vector3 origin = transform.position;
             origin += Vector3.up * climbHeightMaximum;
 
+            Debug.Log(moveSpeed);
             Vector3 end;
             end = origin + (moveDirection * moveSpeed * collisionCheckRange);
             if (Physics.Raycast(origin, moveDirection, out hit, moveSpeed * collisionCheckRange, layerMask))
@@ -284,19 +283,21 @@ public class ThirdPersonControl : MonoBehaviour
     {
         //check Y of new position
         RaycastHit hit;
-        Vector3 origin = transform.position + (moveSpeed * moveDirection * collisionCheckRange);
+        Vector3 origin = transform.position + (moveDirection * moveSpeed * collisionCheckRange);
         origin += Vector3.up * climbHeightMaximum;
         bool GroundHit = (Physics.Raycast(origin, Vector3.down, out hit, climbHeightMaximum, layerMask));
         
-        if (GroundHit && hit.point.y - 0.1f > transform.position.y)
+        if (GroundHit)
         {
-            Debug.DrawLine(origin, hit.point, Color.cyan, 2f);
+            Debug.DrawLine(transform.position, new Vector3(hit.point.x, transform.position.y, hit.point.z), Color.cyan, 2f);
+            float damping = YaxisClimbLerpDelay;
             //move Y smoothly depends on the length difference
-            transform.DOMoveY(hit.point.y, (hit.point.y - transform.position.y) * YaxisClimbLerpDelay);
+            transform.DOMoveY(hit.point.y, (hit.point.y - transform.position.y) * damping);
         }
         else
         {
             Debug.DrawLine(origin, origin + new Vector3(0.0f, -climbHeightMaximum, 0.0f), Color.blue);
+            Debug.DrawLine(transform.position, new Vector3(origin.x, transform.position.y, origin.z), Color.white);
         }
 
         //move XZ
@@ -322,30 +323,21 @@ public class ThirdPersonControl : MonoBehaviour
 
     void Roll()
     {
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Rolling Locomotion") || isRolling)
-        {
-            //already rolling
-            return;
-        }
-
-        rollHorizontal = Input.GetAxisRaw("Horizontal") * 100;
-        rollVertical = Input.GetAxisRaw("Vertical") * 100;
-        if (rollHorizontal == 0 && rollVertical == 0)
+        if (horizontal == 0 && vertical == 0)
         {
             //default roll direction
-            rollVertical = 100;
+            //rollVertical = 100;
         }
+        horizontal = Mathf.MoveTowards(horizontal, Input.GetAxisRaw("Horizontal") * 100f, 100f);
+        vertical = Mathf.MoveTowards(vertical, Input.GetAxisRaw("Vertical") * 100f, 100f);
 
-        //replace
-        horizontal = rollHorizontal;
-        vertical = rollVertical;
-
-        Vector3 direction = new Vector3(rollHorizontal, 0f, rollVertical).normalized;
-
+        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
         float moveTargetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + camera.transform.eulerAngles.y;
         rollDirection = Quaternion.Euler(0f, moveTargetAngle, 0f) * Vector3.forward;
 
+        Debug.Log("Roll Started");
         animator.SetTrigger("Roll");
+        rollingDelta = rollingTime;
         isRolling = true;
     }
 
