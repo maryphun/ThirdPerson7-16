@@ -16,6 +16,7 @@ public class ThirdPersonControl : MonoBehaviour
     public CinemachineVirtualCamera lockOnCamera;
     public CinemachineFreeLook freeLookCamera;
     public GameObject Reticle;
+    public CharacterAttack AttackScript;
 
     [Header("Float Parameters")]
     public float speed = 0.001f;
@@ -36,6 +37,7 @@ public class ThirdPersonControl : MonoBehaviour
     public KeyCode LockOn = KeyCode.Mouse2;
     public KeyCode CameraSideLeft = KeyCode.Q;
     public KeyCode CameraSideRight = KeyCode.E;
+    public KeyCode Attack = KeyCode.Mouse0;
 
     float horizontal;
     float vertical;
@@ -81,6 +83,10 @@ public class ThirdPersonControl : MonoBehaviour
         {
             ChangeSideCamera(Input.GetKeyDown(CameraSideLeft), Input.GetKeyDown(CameraSideRight));
         }
+        if (Input.GetKeyDown(Attack))
+        {
+            AttackScript.Attack();
+        }
 
         //Speed Modifier
         if (Input.GetAxisRaw("Vertical") == 1)
@@ -121,7 +127,7 @@ public class ThirdPersonControl : MonoBehaviour
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
         //move
-        if (direction.magnitude >= 0.1f || isRolling)
+        if ((direction.magnitude >= 0.1f || isRolling) && !animator.GetBool("IsAttacking"))
         {
             Vector3 moveDirection;
             //Rolling Replacement
@@ -133,7 +139,7 @@ public class ThirdPersonControl : MonoBehaviour
             else
             {
                 //replace movespeed
-                moveSpeed = rollingSpeed;
+                moveSpeed = RollSpeed(rollingDelta);
                 //replace direction
                 moveDirection = rollDirection;
                 //check if it should be ended
@@ -152,7 +158,6 @@ public class ThirdPersonControl : MonoBehaviour
             Vector3 origin = transform.position;
             origin += Vector3.up * climbHeightMaximum;
 
-            Debug.Log(moveSpeed);
             Vector3 end;
             end = origin + (moveDirection * moveSpeed * collisionCheckRange);
             if (Physics.Raycast(origin, moveDirection, out hit, moveSpeed * collisionCheckRange, layerMask))
@@ -339,6 +344,11 @@ public class ThirdPersonControl : MonoBehaviour
         animator.SetTrigger("Roll");
         rollingDelta = rollingTime;
         isRolling = true;
+    }
+
+    float RollSpeed(float rolldelta)
+    {
+        return Mathf.Max(rollingSpeed / 1.5f, rollingSpeed * (rolldelta / rollingTime));
     }
 
     bool TooCloseToLockOnTarget(Vector3 newPos)
