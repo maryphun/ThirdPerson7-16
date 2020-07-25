@@ -31,6 +31,7 @@ public class ThirdPersonControl : MonoBehaviour
     public float climbHeightMaximum = 0.25f;
     public float YaxisClimbLerpDelay = 3;   //The higher the value the smoothier it is but take more memory
     public float lockOnCameraOffset = 0.15f;
+    public float collisionCheckRange = 0.10f;
 
     [Header("Key Input Customization")]
     public KeyCode Rolling = KeyCode.Space;
@@ -38,11 +39,11 @@ public class ThirdPersonControl : MonoBehaviour
     public KeyCode CameraSideLeft = KeyCode.Q;
     public KeyCode CameraSideRight = KeyCode.E;
     public KeyCode Attack = KeyCode.Mouse0;
+    public KeyCode WeaponSwitchKey = KeyCode.F;
 
     float horizontal;
     float vertical;
     float moveSpeed;    //speed after multiplier this frame
-    float collisionCheckRange = 0.10f;
     float rollingDelta;
     bool lockOnMode = false;
     bool isRolling;
@@ -86,6 +87,10 @@ public class ThirdPersonControl : MonoBehaviour
         if (Input.GetKeyDown(Attack))
         {
             AttackScript.Attack();
+        }
+        if (Input.GetKeyDown(WeaponSwitchKey))
+        {
+            SwitchWeapon();
         }
 
         //Speed Modifier
@@ -173,7 +178,7 @@ public class ThirdPersonControl : MonoBehaviour
                 }
                 else
                 {
-                    Move(moveDirection);
+                    Move(moveDirection, moveSpeed, 0.0f);
                     Debug.DrawLine(end, end + Vector3.up * 0.5f, Color.green);
                 }
             }
@@ -193,7 +198,8 @@ public class ThirdPersonControl : MonoBehaviour
         {
             foreach (GameObject enemy in enemies)
             {
-                if (IsObjectInSight(enemy.transform, camera))
+                //Check if it's in sight, and not too close to the player
+                if (IsObjectInSight(enemy.transform, camera) && Vector3.Distance(enemy.transform.position, this.transform.position) > speed /2)
                 {
                     enemiesInSight.Add(enemy);
                 }
@@ -284,11 +290,11 @@ public class ThirdPersonControl : MonoBehaviour
         return false;
     }
 
-    void Move(Vector3 moveDirection)
+    public void Move(Vector3 moveDirection, float range, float delay)
     {
         //check Y of new position
         RaycastHit hit;
-        Vector3 origin = transform.position + (moveDirection * moveSpeed * collisionCheckRange);
+        Vector3 origin = transform.position + (moveDirection * range * collisionCheckRange);
         origin += Vector3.up * climbHeightMaximum;
         bool GroundHit = (Physics.Raycast(origin, Vector3.down, out hit, climbHeightMaximum, layerMask));
         
@@ -306,9 +312,9 @@ public class ThirdPersonControl : MonoBehaviour
         }
 
         //move XZ
-        if (!TooCloseToLockOnTarget(transform.position + moveDirection * moveSpeed * Time.deltaTime))
+        if (!TooCloseToLockOnTarget(transform.position + moveDirection * range * Time.deltaTime))
         {
-            transform.DOBlendableLocalMoveBy(moveDirection * moveSpeed * Time.deltaTime, 0f);
+            transform.DOBlendableLocalMoveBy(moveDirection * range * Time.deltaTime, delay);
         }
     }
 
@@ -351,7 +357,7 @@ public class ThirdPersonControl : MonoBehaviour
         return Mathf.Max(rollingSpeed / 1.5f, rollingSpeed * (rolldelta / rollingTime));
     }
 
-    bool TooCloseToLockOnTarget(Vector3 newPos)
+    public bool TooCloseToLockOnTarget(Vector3 newPos)
     {
         bool rtn = false;
         
@@ -366,5 +372,13 @@ public class ThirdPersonControl : MonoBehaviour
         }
 
         return rtn;
+    }
+
+    public void SwitchWeapon()
+    {
+        Debug.Log(AttackScript.Weapon.gameObject.name.ToString());
+        AttackScript.Weapon.gameObject.SetActive(false);
+        AttackScript.Weapon = AttackScript.Weapon.parent.Find("Plain Sword");
+        AttackScript.Weapon.gameObject.SetActive(true);
     }
 }
