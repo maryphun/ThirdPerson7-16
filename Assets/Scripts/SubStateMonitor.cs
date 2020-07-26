@@ -52,5 +52,15 @@ public class SubStateMonitor : StateMachineBehaviour
     override public void OnStateMachineExit(Animator animator, int stateMachinePathHash)
     {
          animator.SetBool("IsAttacking", false);
+
+        //reset triggers
+        for (int i = 0; i <= animator.parameterCount; i++)
+        {
+            //check if it's a trigger type parameters
+            if (animator.GetParameter(i).GetType() == animator.GetParameter(4).GetType())
+            {
+                animator.ResetTrigger(i);
+            }
+        }
     }
 }

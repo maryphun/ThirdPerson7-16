@@ -2,17 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SPECIAL_EFFECT
+{
+    None,
+    Lightning,
+    Explosion,
+}
+
 public class WeaponProperties : MonoBehaviour
 {
     public enum WEAPON_TYPE
     {
         HeavySword,
         LightSword,
+        Axe,
     }
-
+    
     public BoxCollider collider;
     public Cinemachine.CharacterAttack characterAttack;
     public WEAPON_TYPE weaponType;
+    public SPECIAL_EFFECT weaponCode = SPECIAL_EFFECT.None;
 
     public float weaponMass = 1.0f;
     

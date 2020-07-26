@@ -22,5 +22,6 @@ public class EnemyAnimation : MonoBehaviour
     {
         animator.SetFloat("speed", 0.0f);
         //animator.SetTrigger("damage");
+        rigidbody.velocity = Vector3.zero;
     }
 }

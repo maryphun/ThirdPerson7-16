@@ -17,6 +17,8 @@ public class ThirdPersonControl : MonoBehaviour
     public CinemachineFreeLook freeLookCamera;
     public GameObject Reticle;
     public CharacterAttack AttackScript;
+    public GameObject WalkDustLeft;
+    public GameObject WalkDustRight;
 
     [Header("Float Parameters")]
     public float speed = 0.001f;
@@ -132,7 +134,8 @@ public class ThirdPersonControl : MonoBehaviour
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
         //move
-        if ((direction.magnitude >= 0.1f || isRolling) && !animator.GetBool("IsAttacking"))
+        if ((direction.magnitude >= 0.1f || isRolling) && 
+            (animator.GetCurrentAnimatorStateInfo(0).IsName("Rolling Locomotion") || animator.GetCurrentAnimatorStateInfo(0).IsName("Locomotion")))
         {
             Vector3 moveDirection;
             //Rolling Replacement
@@ -180,7 +183,27 @@ public class ThirdPersonControl : MonoBehaviour
                 {
                     Move(moveDirection, moveSpeed, 0.0f);
                     Debug.DrawLine(end, end + Vector3.up * 0.5f, Color.green);
+
+                    //dust particle
+                    ParticleSystem.EmissionModule emissionModule = WalkDustLeft.GetComponent<ParticleSystem>().emission;
+                    if (!emissionModule.enabled)
+                    {
+                        emissionModule.enabled = true;
+                        emissionModule = WalkDustRight.GetComponent<ParticleSystem>().emission;
+                        emissionModule.enabled = true;
+                    }
                 }
+            }
+        }
+        else if (WalkDustLeft.activeSelf)
+        {
+            //turn off dust particle when you're not walking
+            ParticleSystem.EmissionModule emissionModule = WalkDustLeft.GetComponent<ParticleSystem>().emission;
+            if (emissionModule.enabled)
+            {
+                emissionModule.enabled = false;
+                emissionModule = WalkDustRight.GetComponent<ParticleSystem>().emission;
+                emissionModule.enabled = false;
             }
         }
     }
@@ -376,9 +399,6 @@ public class ThirdPersonControl : MonoBehaviour
 
     public void SwitchWeapon()
     {
-        Debug.Log(AttackScript.Weapon.gameObject.name.ToString());
-        AttackScript.Weapon.gameObject.SetActive(false);
-        AttackScript.Weapon = AttackScript.Weapon.parent.Find("Plain Sword");
-        AttackScript.Weapon.gameObject.SetActive(true);
+        animator.SetTrigger("Equip");
     }
 }
