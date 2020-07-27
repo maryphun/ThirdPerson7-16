@@ -8,7 +8,7 @@ namespace Cinemachine
     {
         [Header("Object Parameters")]
         public Animator animator;
-        public Rigidbody rigibody;
+        public Rigidbody rigidbody;
         public Camera camera;
         public ThirdPersonControl ThirdPersonControl;
         public Transform weapon;
@@ -92,7 +92,7 @@ namespace Cinemachine
         public void MoveFront(float distance)
         {
             //reset last force
-            rigibody.velocity = Vector3.zero;
+            rigidbody.velocity = Vector3.zero;
 
             float moveTargetAngle = Mathf.Atan2(0.0f, 1.0f) * Mathf.Rad2Deg + camera.transform.eulerAngles.y;
             Vector3 moveDirection = Quaternion.Euler(0f, moveTargetAngle, 0f) * Vector3.forward;
@@ -120,7 +120,7 @@ namespace Cinemachine
             {
                 if (!Physics.Raycast(end, Vector3.up, out hit2, 0.5f, ThirdPersonControl.layerMask))
                 {
-                    this.GetComponent<Rigidbody>().AddForce(moveDirection * moveSpeed, ForceMode.Impulse);
+                    rigidbody.AddForce(moveDirection * moveSpeed, ForceMode.Impulse);
                 }
             }
         }
@@ -128,10 +128,10 @@ namespace Cinemachine
         public void MoveUp(float distance)
         {
             // reset last force
-            rigibody.velocity = Vector3.zero;
+            rigidbody.velocity = Vector3.zero;
 
             // the heavier the weapon is the higher the player fly
-            this.GetComponent<Rigidbody>().AddForce(Vector3.up * distance * weapon.GetComponent<WeaponProperties>().weaponMass, ForceMode.Impulse);
+            rigidbody.AddForce(Vector3.up * distance * weapon.GetComponent<WeaponProperties>().weaponMass, ForceMode.Impulse);
         }
 
             public void WeaponTrailActivate(int child)
@@ -163,14 +163,14 @@ namespace Cinemachine
             {
                 weaponMass = weapon.GetComponent<WeaponProperties>().weaponMass;
             }
-
+            
             //reset force
             if (attackHitted)
             {
-                rigibody.velocity = Vector3.zero;
+                rigidbody.velocity = Vector3.zero;
                 float moveTargetAngle = Mathf.Atan2(0.0f, 1.0f) * Mathf.Rad2Deg + camera.transform.eulerAngles.y;
                 Vector3 moveDirection = Quaternion.Euler(0f, moveTargetAngle, 0f) * Vector3.forward;
-                rigibody.AddForce((-moveDirection * enemyMass) / weaponMass, ForceMode.Impulse);
+                rigidbody.AddForce((-moveDirection * enemyMass) / weaponMass, ForceMode.Impulse);
             }
 
             //shake the camera
@@ -265,14 +265,6 @@ namespace Cinemachine
                 if (p.type == AnimatorControllerParameterType.Trigger)
                     animator.ResetTrigger(p.name);
             }
-            //for (int i = 0; i <= animator.parameterCount; i++)
-            //{
-            //    //check if it's a trigger type parameters
-            //    if (animator.GetParameter(i).GetType() == animator.GetParameter(4).GetType())
-            //    {
-            //        animator.ResetTrigger(i);
-            //    }
-            //}
         }
 
         void WeaponSpecificEffect()
@@ -291,9 +283,15 @@ namespace Cinemachine
         {
             animator.ResetTrigger(parameter);
         }
-
         
-
+        void ResetAllAnimationTrigger()
+        {
+            foreach (AnimatorControllerParameter p in animator.parameters)
+            {
+                if (p.type == AnimatorControllerParameterType.Trigger)
+                    animator.ResetTrigger(p.name);
+            }
+        }
 
         private void OnValidate()
         {

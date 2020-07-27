@@ -42,6 +42,7 @@ public class ThirdPersonControl : MonoBehaviour
     public KeyCode CameraSideRight = KeyCode.E;
     public KeyCode Attack = KeyCode.Mouse0;
     public KeyCode WeaponSwitchKey = KeyCode.F;
+    public KeyCode PickupKey = KeyCode.R;
 
     float horizontal;
     float vertical;
@@ -93,6 +94,10 @@ public class ThirdPersonControl : MonoBehaviour
         if (Input.GetKeyDown(WeaponSwitchKey))
         {
             SwitchWeapon();
+        }
+        if (Input.GetKeyDown(PickupKey))
+        {
+            animator.SetTrigger("Pickup");
         }
 
         //Speed Modifier

@@ -47,20 +47,25 @@ public class WeaponProperties : MonoBehaviour
             {
                 characterAttack.AttackHitted(true, target.attachedRigidbody.mass);
             }
+            DealDamage(target.transform);
         }
     }
 
-    private void DealDamage(Transform target)
+    private void DealDamage(Transform damagedtarget)
     {
         //deal damage
         float damageCalculate = Random.Range(attackDamageMin, attackDamageMax);
-        if (target.GetComponent<EnemyAnimation>() != null)
+        if (damagedtarget.GetComponent<EnemyAnimation>() != null)
         {
-            target.GetComponent<EnemyAnimation>().TakeDamage(damageCalculate);
+            damagedtarget.GetComponent<EnemyAnimation>().TakeDamage(damageCalculate);
         }
 
         //draw fx
-        GameObject hitEffect = Instantiate(hitFX, target.transform.position, Quaternion.identity);
-        Destroy(hitEffect, hitEffect.GetComponent<ParticleSystem>().main.duration);
+        if (hitFX != null)
+        {
+            Vector3 damagePosition = damagedtarget.transform.position;
+            damagePosition.y = transform.Find("ImpactPoint").transform.position.y;
+            GameObject fx = Instantiate(hitFX, damagePosition, Quaternion.identity);
+        }
     }
 }
