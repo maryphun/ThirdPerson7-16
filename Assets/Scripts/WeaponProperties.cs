@@ -24,7 +24,10 @@ public class WeaponProperties : MonoBehaviour
     public SPECIAL_EFFECT weaponCode = SPECIAL_EFFECT.None;
 
     public float weaponMass = 1.0f;
-    
+    public float attackDamageMin = 0.0f;
+    public float attackDamageMax = 0.0f;
+    public GameObject hitFX;
+
 
     List<Transform> hittedEnemy = new List<Transform>();
 
@@ -45,5 +48,19 @@ public class WeaponProperties : MonoBehaviour
                 characterAttack.AttackHitted(true, target.attachedRigidbody.mass);
             }
         }
+    }
+
+    private void DealDamage(Transform target)
+    {
+        //deal damage
+        float damageCalculate = Random.Range(attackDamageMin, attackDamageMax);
+        if (target.GetComponent<EnemyAnimation>() != null)
+        {
+            target.GetComponent<EnemyAnimation>().TakeDamage(damageCalculate);
+        }
+
+        //draw fx
+        GameObject hitEffect = Instantiate(hitFX, target.transform.position, Quaternion.identity);
+        Destroy(hitEffect, hitEffect.GetComponent<ParticleSystem>().main.duration);
     }
 }

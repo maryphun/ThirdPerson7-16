@@ -369,7 +369,6 @@ public class ThirdPersonControl : MonoBehaviour
         float moveTargetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + camera.transform.eulerAngles.y;
         rollDirection = Quaternion.Euler(0f, moveTargetAngle, 0f) * Vector3.forward;
 
-        Debug.Log("Roll Started");
         animator.SetTrigger("Roll");
         rollingDelta = rollingTime;
         isRolling = true;

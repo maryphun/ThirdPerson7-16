@@ -54,13 +54,18 @@ public class SubStateMonitor : StateMachineBehaviour
          animator.SetBool("IsAttacking", false);
 
         //reset triggers
-        for (int i = 0; i <= animator.parameterCount; i++)
+        foreach (AnimatorControllerParameter p in animator.parameters)
         {
-            //check if it's a trigger type parameters
-            if (animator.GetParameter(i).GetType() == animator.GetParameter(4).GetType())
-            {
-                animator.ResetTrigger(i);
-            }
+            if (p.type == AnimatorControllerParameterType.Trigger)
+                animator.ResetTrigger(p.name);
         }
+        //for (int i = 0; i <= animator.parameterCount; i++)
+        //{
+        //    //check if it's a trigger type parameters
+        //    if (animator.GetParameter(i).GetType() == animator.GetParameter(4).GetType())
+        //    {
+        //        animator.ResetTrigger(i);
+        //    }
+        //}
     }
 }

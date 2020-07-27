@@ -24,4 +24,9 @@ public class EnemyAnimation : MonoBehaviour
         //animator.SetTrigger("damage");
         rigidbody.velocity = Vector3.zero;
     }
+
+    public void TakeDamage(float damage)
+    {
+
+    }
 }
