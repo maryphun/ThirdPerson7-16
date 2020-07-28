@@ -97,7 +97,7 @@ public class CharacterInventory : MonoBehaviour
 
     public void TakeItem()
     {
-        //search the backweapon list
+        //search the backweapon list and enable it
         GameObject newWeapon = controller.AttackScript.secondWeaponParent.Find(showItem.GetComponent<ItemProperties>().itemName).gameObject;
         newWeapon.SetActive(true);
         if (controller.AttackScript.secondWeapon != null)
@@ -107,7 +107,6 @@ public class CharacterInventory : MonoBehaviour
             ItemProperties newProperties = controller.AttackScript.secondWeapon.GetComponent<ItemProperties>();
             if (newProperties != null)
             {
-                Debug.Log("pick up " + newProperties.itemName);
                 ItemProperties properties = showItem.GetComponent<ItemProperties>();
                 // apply new properties to the item
                 properties.itemName = newProperties.itemName;
@@ -132,7 +131,6 @@ public class CharacterInventory : MonoBehaviour
                 torque.y = Random.Range(4, 5);
                 torque.z = (Random.Range(0, 2) * 2 - 1) * range;
                 showItem.GetComponent<Rigidbody>().AddForce(torque, ForceMode.Impulse);
-                Debug.Log(torque.x + "," + torque.z);
             }
         }
         else

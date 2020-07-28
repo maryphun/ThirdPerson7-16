@@ -16,6 +16,7 @@ public class WeaponProperties : MonoBehaviour
         HeavySword,
         LightSword,
         Axe,
+        UltraHeavyProps,
     }
     
     public BoxCollider collider;

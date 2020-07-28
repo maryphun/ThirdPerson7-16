@@ -134,7 +134,7 @@ namespace Cinemachine
             rigidbody.AddForce(Vector3.up * distance * weapon.GetComponent<WeaponProperties>().weaponMass, ForceMode.Impulse);
         }
 
-            public void WeaponTrailActivate(int child)
+       Å@public void WeaponTrailActivate(int child)
         {
             if (weapon != null)
             {
@@ -296,6 +296,12 @@ namespace Cinemachine
         void PickUpFrame()
         {
             ThirdPersonControl.inventory.TakeItem();
+        }
+
+        void AnimatorLayerWeight(float weight)
+        {
+            animator.SetLayerWeight(1, weight);
+            Debug.Log(animator.GetLayerName(1) + " set to weight " + weight.ToString());
         }
 
         private void OnValidate()

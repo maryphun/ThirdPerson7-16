@@ -22,6 +22,15 @@ public class ItemProperties : MonoBehaviour
     private Transform visual;
     void Start()
     {
+        // detect if this is a pickable item
+        if (this.tag != "PickableItem")
+        {
+            enabled = false;
+            // This should not happen so we should give out a warning
+            Debug.LogWarning("An active itemProperties script on a non-pickable item!", transform);
+            return;
+        }
+
         //get collider
         interactCollider = GetComponent<Collider>();
 
@@ -45,16 +54,28 @@ public class ItemProperties : MonoBehaviour
 
     public void ResetItem()
     {
-        //get collider
+        // detect if this is a pickable item
+        if (this.tag != "PickableItem")
+        {
+            enabled = false;
+            // This should not happen so we should give out a warning
+            Debug.LogWarning("Item properties funtion called on an non-pickable item!", transform);
+            return;
+        }
+
+        //retarget the collider
         interactCollider = GetComponent<Collider>();
 
-        Destroy(visual.gameObject);
+        if (visual != null)
+        {
+            Destroy(visual.gameObject);
+        }
         visual = Instantiate(visualMesh, this.transform, false).transform;
 
         // check if it have a collider. If so, remove it automatically.
-        if (visual.GetComponent<MeshCollider>() != null)
+        if (visual.GetComponent<Collider>() != null)
         {
-            visual.GetComponent<MeshCollider>().enabled = false;
+            visual.GetComponent<Collider>().enabled = false;
         }
 
         // make it taller

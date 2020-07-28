@@ -25,6 +25,7 @@ public class ThirdPersonControl : MonoBehaviour
     public float speed = 0.001f;
     public float frontSpeedMultiplier = 1.25f;
     public float horizontalSpeedMultiplier = 1.25f;
+    public float weaponSwapingSpeedMultiplier = 0.65f;
     public float rollingSpeed = 3f;
     public float rollingTime = 1.0f;
     public float animationTransmitionRate = 5.0f;
@@ -49,6 +50,7 @@ public class ThirdPersonControl : MonoBehaviour
     float vertical;
     float moveSpeed;    //speed after multiplier this frame
     float rollingDelta;
+    public float animatorSpeedDampDelta;
     bool lockOnMode = false;
     bool isRolling;
     Vector3 rollDirection;
@@ -76,8 +78,13 @@ public class ThirdPersonControl : MonoBehaviour
         //input
         if (!isRolling)
         {
-            horizontal = Mathf.MoveTowards(horizontal, Input.GetAxisRaw("Horizontal") * 100f, animationTransmitionRate);
-            vertical = Mathf.MoveTowards(vertical, Input.GetAxisRaw("Vertical") * 100f, animationTransmitionRate);
+            float target = 100.0f;
+            if (!animator.GetCurrentAnimatorStateInfo(1).IsName("empty"))
+            {
+                target = 30f;
+            }
+            horizontal = Mathf.MoveTowards(horizontal, Input.GetAxisRaw("Horizontal") * target, animationTransmitionRate);
+            vertical = Mathf.MoveTowards(vertical, Input.GetAxisRaw("Vertical") * target, animationTransmitionRate);
             if (Input.GetKeyDown(Rolling)) Roll();
         }
         if (Input.GetKeyDown(LockOn)) //middle click
@@ -92,8 +99,13 @@ public class ThirdPersonControl : MonoBehaviour
         {
             AttackScript.Attack();
         }
-        if (Input.GetKeyDown(WeaponSwitchKey))
+        if (Input.GetKeyUp(Attack) && animator.GetBool("IsAttacking") == true)
         {
+            animator.SetTrigger("AttackKeyUp");
+        }
+        if (Input.GetKeyDown(WeaponSwitchKey) && animator.GetCurrentAnimatorStateInfo(0).IsName("Locomotion"))
+        {
+            animator.SetLayerWeight(1, 1.0f);
             SwitchWeapon();
         }
         if (Input.GetKeyDown(PickupKey) && inventory.PickUpAvailable())
@@ -114,7 +126,7 @@ public class ThirdPersonControl : MonoBehaviour
         //animation parameters
         animator.SetFloat("Horizontal", horizontal);
         animator.SetFloat("Vertical", vertical);
-        animator.SetFloat("Speed", speed * 0.75f);
+        animator.SetFloat("Speed", speed);
         animator.SetBool("Idle", (horizontal == 0 && vertical == 0));
 
         //rotate
@@ -130,13 +142,7 @@ public class ThirdPersonControl : MonoBehaviour
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
             transform.localRotation = Quaternion.Euler(0f, angle, 0f);
         }
-
-        //jump
-        //if (Input.GetKeyDown(KeyCode.Space))
-        //{
-        //    rigidbody.AddForce(Vector3.up * 3.5f, ForceMode.Impulse);
-        //}
-
+        
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
         //move
@@ -149,6 +155,13 @@ public class ThirdPersonControl : MonoBehaviour
             {
                 float moveTargetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + camera.transform.eulerAngles.y;
                 moveDirection = Quaternion.Euler(0f, moveTargetAngle, 0f) * Vector3.forward;
+
+                // doing other thing while moving might slow down the movementspeed
+                if (animator.GetCurrentAnimatorStateInfo(1).IsName("Equip"))
+                {
+                    Debug.Log("change speed" + moveSpeed + " * " + weaponSwapingSpeedMultiplier + " = " + (moveSpeed * weaponSwapingSpeedMultiplier));
+                    moveSpeed *= weaponSwapingSpeedMultiplier;
+                }
             }
             else
             {
