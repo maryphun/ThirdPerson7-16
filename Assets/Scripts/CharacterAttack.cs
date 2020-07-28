@@ -293,6 +293,11 @@ namespace Cinemachine
             }
         }
 
+        void PickUpFrame()
+        {
+            ThirdPersonControl.inventory.TakeItem();
+        }
+
         private void OnValidate()
         {
             m_ImpulseDefinition.OnValidate();

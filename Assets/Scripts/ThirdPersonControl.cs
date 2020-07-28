@@ -17,6 +17,7 @@ public class ThirdPersonControl : MonoBehaviour
     public CinemachineFreeLook freeLookCamera;
     public GameObject Reticle;
     public CharacterAttack AttackScript;
+    public CharacterInventory inventory;
     public GameObject WalkDustLeft;
     public GameObject WalkDustRight;
 
@@ -95,7 +96,7 @@ public class ThirdPersonControl : MonoBehaviour
         {
             SwitchWeapon();
         }
-        if (Input.GetKeyDown(PickupKey))
+        if (Input.GetKeyDown(PickupKey) && inventory.PickUpAvailable())
         {
             animator.SetTrigger("Pickup");
         }
