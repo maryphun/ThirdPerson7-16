@@ -42,7 +42,6 @@ public class WeaponProperties : MonoBehaviour
     {
         if (target.tag == "Enemy" && !hittedEnemy.Contains(target.transform))
         {
-            target.GetComponent<Rigidbody>().AddForce(Vector3.up * 3f, ForceMode.Impulse);
             hittedEnemy.Add(target.transform);
             if (characterAttack != null)
             {
@@ -56,9 +55,9 @@ public class WeaponProperties : MonoBehaviour
     {
         //deal damage
         float damageCalculate = Random.Range(attackDamageMin, attackDamageMax);
-        if (damagedtarget.GetComponent<EnemyAnimation>() != null)
+        if (damagedtarget.GetComponent<EnemyProperties>() != null)
         {
-            damagedtarget.GetComponent<EnemyAnimation>().TakeDamage(damageCalculate);
+            damagedtarget.GetComponent<EnemyProperties>().TakeDamage(damageCalculate);
         }
 
         //draw fx

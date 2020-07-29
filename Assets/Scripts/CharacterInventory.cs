@@ -79,10 +79,10 @@ public class CharacterInventory : MonoBehaviour
         ItemProperties properties = showItem.GetComponent<ItemProperties>();
         if (properties != null)
         {
-            Canvas.GetComponent<CanvasTransparency>().SetTextMesh(showItem.GetComponent<ItemProperties>().itemName);
-            Canvas.GetComponent<CanvasTransparency>().SetAlpha(0.8f, 0.05f);
-            Canvas.GetComponent<CanvasTransparency>().SetTextColor(showItem.GetComponent<ItemProperties>().textColor);
-            Canvas.GetComponent<CanvasTransparency>().SetKeyInputTextMesh(controller.PickupKey.ToString());
+            Canvas.GetComponent<CanvasProperties>().SetTextMesh(0, showItem.GetComponent<ItemProperties>().itemName);
+            Canvas.GetComponent<CanvasProperties>().SetAlpha(0.8f, 0.05f);
+            Canvas.GetComponent<CanvasProperties>().SetTextColor(0, showItem.GetComponent<ItemProperties>().textColor);
+            Canvas.GetComponent<CanvasProperties>().SetTextMesh(1, controller.PickupKey.ToString());
         }
     }
 
@@ -91,7 +91,7 @@ public class CharacterInventory : MonoBehaviour
         ItemProperties properties = showItem.GetComponent<ItemProperties>();
         if (properties != null)
         {
-            Canvas.GetComponent<CanvasTransparency>().SetAlpha(0.0f, 0.05f);
+            Canvas.GetComponent<CanvasProperties>().SetAlpha(0.0f, 0.05f);
         }
     }
 

@@ -14,10 +14,10 @@ public class PlayerIKFootPlacement : MonoBehaviour
     {
         if (animator)
         {
-            animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1f);
-            animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1f);
-            animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1f);
-            animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1f);
+            animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 0.7f);
+            animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 0.7f);
+            animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 0.7f);
+            animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 0.7f);
 
             //Left Foot
             RaycastHit hit;

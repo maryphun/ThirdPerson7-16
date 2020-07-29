@@ -191,8 +191,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8414457}
-  m_LocalRotation: {x: 1e-45, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.055786178, y: -0, z: 0, w: 0.99844277}
+  m_LocalPosition: {x: 0, y: -0.29948997, z: 0.3282795}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 735096956}
@@ -933,6 +933,7 @@ GameObject:
   - component: {fileID: 236087060}
   - component: {fileID: 236087059}
   - component: {fileID: 236087058}
+  - component: {fileID: 236087057}
   m_Layer: 10
   m_Name: EnemyObject
   m_TagString: Enemy
@@ -940,6 +941,29 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &236087057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 236087056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10ffdc4beb6bbd14288f602fc70ee0da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hpbar: {fileID: 7234720166968363483, guid: 63844b8327f2fbf46abd0ab882486910, type: 3}
+  rigidbody: {fileID: 236087059}
+  collider: {fileID: 236087058}
+  enemyName: Wanderer
+  speed: 0.001
+  frontSpeedMultiplier: 1.25
+  animationTransmitionRate: 5
+  turnSmoothTime: 0.01
+  turnSmoothVelocity: 0
+  hitpoint: 1000
+  hpBarOffset: 0
 --- !u!65 &236087058
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6169,7 +6193,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.00079345703, y: -8.424979}
+  m_AnchoredPosition: {x: 0, y: -8.4288}
   m_SizeDelta: {x: 100, y: 83.14392}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &344458231
@@ -19521,7 +19545,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: -0.018189494, y: -0.0000000021505209, z: -3.9123354e-11, w: 0.9998346}
+  m_LocalRotation: {x: -0.018189494, y: -0.0000000018623373, z: -3.3880575e-11, w: 0.9998346}
   m_LocalPosition: {x: 28.05, y: 10.074, z: -31.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -21326,7 +21350,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1372929775}
-  m_LocalRotation: {x: -0.03632495, y: -1e-45, z: -0, w: 0.99934006}
+  m_LocalRotation: {x: -0.036324937, y: -0.000000012989426, z: -4.721514e-10, w: 0.99934006}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -23311,7 +23335,7 @@ GameObject:
   - component: {fileID: 1466137783}
   - component: {fileID: 1466137784}
   m_Layer: 10
-  m_Name: Character_Skeleton_Soldier_01
+  m_Name: Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23329,16 +23353,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 372d6a6ada388ee4488d86a426c920b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidbody: {fileID: 236087059}
   animator: {fileID: 1475378030}
   IKLayerMask:
     serializedVersion: 2
     m_Bits: 512
-  speed: 0.001
-  frontSpeedMultiplier: 1.25
-  animationTransmitionRate: 5
-  turnSmoothTime: 0.01
-  turnSmoothVelocity: 0
   distanceToGround: 0.08
 --- !u!65 &1466137784
 BoxCollider:
@@ -32996,7 +33014,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0043945312, y: -357.86}
+  m_AnchoredPosition: {x: 0, y: -358}
   m_SizeDelta: {x: 364.0288, y: 66.28784}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1889341515
@@ -33074,8 +33092,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   aValue: 0
   trans: {fileID: 1889341519}
-  textmesh: {fileID: 344458231}
-  keyInputTextMesh: {fileID: 130640540}
+  textmesh:
+  - {fileID: 344458231}
+  - {fileID: 130640540}
 --- !u!225 &1889341519
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -38853,7 +38872,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2085187628}
-  m_LocalRotation: {x: -0.018189492, y: -0.0000000010753793, z: -1.956384e-11, w: 0.9998346}
+  m_LocalRotation: {x: -0.018189492, y: -6.141037e-16, z: -1.0356996e-17, w: 0.9998346}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -49169,7 +49188,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &2886866016983924772
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -49254,7 +49273,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &3141673701222042297
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -51478,7 +51497,7 @@ MonoBehaviour:
   rigidbody: {fileID: 1998059067}
   camera: {fileID: 963194227}
   ThirdPersonControl: {fileID: 1998059065}
-  weapon: {fileID: 2886866016984124907}
+  weapon: {fileID: 3139640990041351012}
   secondWeapon: {fileID: 547018796}
   weaponParent: {fileID: 8869352918460551162}
   secondWeaponParent: {fileID: 1730557691}

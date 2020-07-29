@@ -138,7 +138,11 @@ namespace Cinemachine
         {
             if (weapon != null)
             {
-                weapon.Find("Trail").gameObject.SetActive(true);
+                Transform trail = weapon.Find("Trail");
+                if (trail != null)
+                {
+                    trail.gameObject.SetActive(true);
+                }
                 //ParticleSystem.EmissionModule particle = weapon.Find("Trail").GetChild(0).GetComponent<ParticleSystem>().emission;
                 //particle.enabled = true;
             }
@@ -148,7 +152,11 @@ namespace Cinemachine
         {
             if (weapon != null)
             {
-                weapon.Find("Trail").gameObject.SetActive(false);
+                Transform trail = weapon.Find("Trail");
+                if (trail != null)
+                {
+                    trail.gameObject.SetActive(false);
+                }
                 //ParticleSystem.EmissionModule particle = weapon.Find("Trail").GetChild(0).GetComponent<ParticleSystem>().emission;
                 //particle.enabled = false;
             }
@@ -301,7 +309,16 @@ namespace Cinemachine
         void AnimatorLayerWeight(float weight)
         {
             animator.SetLayerWeight(1, weight);
-            Debug.Log(animator.GetLayerName(1) + " set to weight " + weight.ToString());
+        }
+
+        void CloseBool(string parameter)
+        {
+            animator.SetBool(parameter, false);
+        }
+
+        void OpenBool(string parameter)
+        {
+            animator.SetBool(parameter, true);
         }
 
         private void OnValidate()

@@ -79,10 +79,10 @@ public class ThirdPersonControl : MonoBehaviour
         if (!isRolling)
         {
             float target = 100.0f;
-            if (!animator.GetCurrentAnimatorStateInfo(1).IsName("empty"))
-            {
-                target = 30f;
-            }
+            //if (!animator.GetCurrentAnimatorStateInfo(1).IsName("empty"))
+            //{
+            //    target = 30f;
+            //}
             horizontal = Mathf.MoveTowards(horizontal, Input.GetAxisRaw("Horizontal") * target, animationTransmitionRate);
             vertical = Mathf.MoveTowards(vertical, Input.GetAxisRaw("Vertical") * target, animationTransmitionRate);
             if (Input.GetKeyDown(Rolling)) Roll();
@@ -103,9 +103,8 @@ public class ThirdPersonControl : MonoBehaviour
         {
             animator.SetTrigger("AttackKeyUp");
         }
-        if (Input.GetKeyDown(WeaponSwitchKey) && animator.GetCurrentAnimatorStateInfo(0).IsName("Locomotion"))
+        if (Input.GetKeyDown(WeaponSwitchKey))
         {
-            animator.SetLayerWeight(1, 1.0f);
             SwitchWeapon();
         }
         if (Input.GetKeyDown(PickupKey) && inventory.PickUpAvailable())
@@ -159,7 +158,6 @@ public class ThirdPersonControl : MonoBehaviour
                 // doing other thing while moving might slow down the movementspeed
                 if (animator.GetCurrentAnimatorStateInfo(1).IsName("Equip"))
                 {
-                    Debug.Log("change speed" + moveSpeed + " * " + weaponSwapingSpeedMultiplier + " = " + (moveSpeed * weaponSwapingSpeedMultiplier));
                     moveSpeed *= weaponSwapingSpeedMultiplier;
                 }
             }
@@ -417,6 +415,10 @@ public class ThirdPersonControl : MonoBehaviour
 
     public void SwitchWeapon()
     {
-        animator.SetTrigger("Equip");
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Locomotion"))
+        {
+            animator.SetTrigger("Equip");
+            animator.SetLayerWeight(1, 1.0f);
+        }
     }
 }

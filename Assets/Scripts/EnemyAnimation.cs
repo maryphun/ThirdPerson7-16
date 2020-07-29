@@ -4,34 +4,17 @@ using UnityEngine;
 
 public class EnemyAnimation : MonoBehaviour
 {
-    public Rigidbody rigidbody;
     public Animator animator;
     public LayerMask IKLayerMask;
 
-    public float speed = 0.001f;
-    public float frontSpeedMultiplier = 1.25f;
-    public float animationTransmitionRate = 5.0f;
-    public float turnSmoothTime = 0.01f;
-    public float turnSmoothVelocity;
-
-    float horizontal;
-    float vertical;
-    float moveSpeed;    //speed after multiplier this frame
-
-    [Range (0, 1f)]
+    [Range(0, 1f)]
     public float distanceToGround;
 
-    // Update is called once per frame
+
+
     void Update()
     {
         animator.SetFloat("speed", 0.0f);
-        //animator.SetTrigger("damage");
-        rigidbody.velocity = Vector3.zero;
-    }
-
-    public void TakeDamage(float damage)
-    {
-
     }
 
     void OnAnimatorIK()
