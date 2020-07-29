@@ -7,55 +7,80 @@ using Cinemachine.Utility;
 
 public class ThirdPersonControl : MonoBehaviour
 {
-    [Header("Object Parameters")]
+    [Header("Object References")]
     public Camera camera;
     public Rigidbody rigidbody;
     public Animator animator;
     public LayerMask layerMask;
     public Transform lockOnTarget;
-    public CinemachineVirtualCamera lockOnCamera;
-    public CinemachineFreeLook freeLookCamera;
-    public GameObject Reticle;
     public CharacterAttack AttackScript;
     public CharacterInventory inventory;
-    public GameObject WalkDustLeft;
-    public GameObject WalkDustRight;
+    [SerializeField]
+    private CinemachineVirtualCamera lockOnCamera;
+    [SerializeField]
+    private CinemachineFreeLook freeLookCamera;
+    [SerializeField]
+    private GameObject Reticle;
+    [SerializeField]
+    private GameObject WalkDustLeft;
+    [SerializeField]
+    private GameObject WalkDustRight;
 
     [Header("Float Parameters")]
-    public float speed = 0.001f;
-    public float frontSpeedMultiplier = 1.25f;
-    public float horizontalSpeedMultiplier = 1.25f;
-    public float weaponSwapingSpeedMultiplier = 0.65f;
-    public float rollingSpeed = 3f;
-    public float rollingTime = 1.0f;
-    public float animationTransmitionRate = 5.0f;
-    public float turnSmoothTime = 0.01f;
-    public float turnSmoothVelocity;
-    public float lockOnSearchRange = 20.0f;
     public float climbHeightMaximum = 0.25f;
-    public float YaxisClimbLerpDelay = 3;   //The higher the value the smoothier it is but take more memory
-    public float lockOnCameraOffset = 0.15f;
     public float collisionCheckRange = 0.10f;
+    [SerializeField]
+    private float speed = 0.001f;
+    [SerializeField]
+    private float frontSpeedMultiplier = 1.25f;
+    [SerializeField]
+    private float horizontalSpeedMultiplier = 1.25f;
+    [SerializeField]
+    private float weaponSwapingSpeedMultiplier = 0.65f;
+    [SerializeField]
+    private float rollingSpeed = 3f;
+    [SerializeField]
+    private float rollingTime = 1.0f;
+    [SerializeField]
+    private float animationTransmitionRate = 5.0f;
+    [SerializeField]
+    private float turnSmoothTime = 0.01f;
+    [SerializeField]
+    private float turnSmoothVelocity;
+    [SerializeField]
+    private float lockOnSearchRange = 20.0f;
+    [SerializeField]
+    private float YaxisClimbLerpDelay = 3;   //The higher the value the smoothier it is but take more memory
+    [SerializeField]
+    private float lockOnCameraOffset = 0.15f;
 
     [Header("Key Input Customization")]
-    public KeyCode Rolling = KeyCode.Space;
-    public KeyCode LockOn = KeyCode.Mouse2;
-    public KeyCode CameraSideLeft = KeyCode.Q;
-    public KeyCode CameraSideRight = KeyCode.E;
-    public KeyCode Attack = KeyCode.Mouse0;
-    public KeyCode WeaponSwitchKey = KeyCode.F;
     public KeyCode PickupKey = KeyCode.R;
+    [SerializeField]
+    private KeyCode Rolling = KeyCode.Space;
+    [SerializeField]
+    private KeyCode LockOn = KeyCode.Mouse2;
+    [SerializeField]
+    private KeyCode CameraSideLeft = KeyCode.Q;
+    [SerializeField]
+    private KeyCode CameraSideRight = KeyCode.E;
+    [SerializeField]
+    private KeyCode Attack = KeyCode.Mouse0;
+    [SerializeField]
+    private KeyCode WeaponSwitchKey = KeyCode.F;
 
-    float horizontal;
-    float vertical;
-    float moveSpeed;    //speed after multiplier this frame
-    float rollingDelta;
-    public float animatorSpeedDampDelta;
-    bool lockOnMode = false;
-    bool isRolling;
-    Vector3 rollDirection;
-    CinemachineOrbitalTransposer[] orbital = new CinemachineOrbitalTransposer[3];
-    CinemachineVirtualCamera[] rigs = new CinemachineVirtualCamera[3];
+    private float horizontal;
+    private float vertical;
+    private float moveSpeed;    //speed after multiplier this frame
+    private float rollingDelta;
+    private bool lockOnMode = false;
+    private bool isRolling;
+    private Vector3 rollDirection;
+
+    [SerializeField]
+    private CinemachineOrbitalTransposer[] orbital = new CinemachineOrbitalTransposer[3];
+    [SerializeField]
+    private CinemachineVirtualCamera[] rigs = new CinemachineVirtualCamera[3];
 
     void Start()
     {

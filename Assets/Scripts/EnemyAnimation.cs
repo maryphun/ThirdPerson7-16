@@ -6,6 +6,7 @@ public class EnemyAnimation : MonoBehaviour
 {
     public Animator animator;
     public LayerMask IKLayerMask;
+    public Collider solidPhysicalCollider;
 
     [Range(0, 1f)]
     public float distanceToGround;
@@ -49,5 +50,12 @@ public class EnemyAnimation : MonoBehaviour
                 animator.SetIKRotation(AvatarIKGoal.RightFoot, Quaternion.LookRotation(transform.forward, hit.normal));
             }
         }
+    }
+
+    public void Death()
+    {
+        animator.SetTrigger("death");
+        enabled = false;
+        solidPhysicalCollider.enabled = false;
     }
 }

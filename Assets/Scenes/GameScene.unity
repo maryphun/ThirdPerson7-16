@@ -191,8 +191,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8414457}
-  m_LocalRotation: {x: -0.055786178, y: -0, z: 0, w: 0.99844277}
-  m_LocalPosition: {x: 0, y: -0.29948997, z: 0.3282795}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 735096956}
@@ -665,7 +665,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &188650468
 PrefabInstance:
@@ -722,7 +722,7 @@ PrefabInstance:
     - target: {fileID: 5193087934879426699, guid: 7ac5521c451c07543b7fa39ecf8d9772,
         type: 3}
       propertyPath: m_RootOrder
-      value: 11
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5193087934879426699, guid: 7ac5521c451c07543b7fa39ecf8d9772,
         type: 3}
@@ -934,6 +934,7 @@ GameObject:
   - component: {fileID: 236087059}
   - component: {fileID: 236087058}
   - component: {fileID: 236087057}
+  - component: {fileID: 236087061}
   m_Layer: 10
   m_Name: EnemyObject
   m_TagString: Enemy
@@ -955,15 +956,48 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hpbar: {fileID: 7234720166968363483, guid: 63844b8327f2fbf46abd0ab882486910, type: 3}
   rigidbody: {fileID: 236087059}
-  collider: {fileID: 236087058}
+  triggerCollider: {fileID: 236087058}
+  hpBarRoot: {fileID: 1466419716}
+  animationController: {fileID: 1466137783}
+  model: {fileID: 1466130714}
   enemyName: Wanderer
+  hpBarColor:
+    serializedVersion: 2
+    key0: {r: 0.509434, g: 0, b: 0, a: 1}
+    key1: {r: 0.6132076, g: 0, b: 0, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  hpBarFollowColor: {r: 0.3, g: 0, b: 0, a: 1}
   speed: 0.001
   frontSpeedMultiplier: 1.25
   animationTransmitionRate: 5
   turnSmoothTime: 0.01
   turnSmoothVelocity: 0
   hitpoint: 1000
-  hpBarOffset: 0
+  hpBarOffset: 0.3
 --- !u!65 &236087058
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1001,7 +1035,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 236087056}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 28.166, y: 10, z: -26.646}
+  m_LocalPosition: {x: 28.166, y: 9.826, z: -26.646}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1466344838}
@@ -1009,6 +1043,24 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!114 &236087061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 236087056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f690c713d03469478ceeb8302e91fcc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainScript: {fileID: 236087057}
+  removeAfterDead:
+  - {fileID: 511654662}
+  - {fileID: 1705525746}
+  - {fileID: 1911812832}
+  delay: 6.5
 --- !u!1001 &236157709
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7638,9 +7690,9 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 963194227}
   m_PlaneDistance: 100
-  m_PixelPerfect: 0
+  m_PixelPerfect: 1
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
@@ -19545,7 +19597,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: -0.018189494, y: -0.0000000018623373, z: -3.3880575e-11, w: 0.9998346}
+  m_LocalRotation: {x: -0.018189494, y: 0.000000002150442, z: 3.912192e-11, w: 0.9998346}
   m_LocalPosition: {x: 28.05, y: 10.074, z: -31.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -21350,7 +21402,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1372929775}
-  m_LocalRotation: {x: -0.036324937, y: -0.000000012989426, z: -4.721514e-10, w: 0.99934006}
+  m_LocalRotation: {x: -0.03632495, y: 1e-45, z: -0, w: 0.99934006}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -23357,6 +23409,7 @@ MonoBehaviour:
   IKLayerMask:
     serializedVersion: 2
     m_Bits: 512
+  solidPhysicalCollider: {fileID: 1466137784}
   distanceToGround: 0.08
 --- !u!65 &1466137784
 BoxCollider:
@@ -33085,7 +33138,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1889341513}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f5cb1ebe378588e49af1256822c3e8c6, type: 3}
   m_Name: 
@@ -33095,6 +33148,7 @@ MonoBehaviour:
   textmesh:
   - {fileID: 344458231}
   - {fileID: 130640540}
+  progressor: []
 --- !u!225 &1889341519
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -33103,7 +33157,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1889341513}
   m_Enabled: 1
-  m_Alpha: 0.3
+  m_Alpha: 0
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
@@ -38594,7 +38648,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Canvas: {fileID: 1889341513}
   controller: {fileID: 1998059065}
+  itemNameDisplayAlpha: 0.8
+  itemNameDisplaySpeed: 0.05
+  tossItemForce: 5
   itemNearby: 0
+  itemDistanceCompareMax: 1000
 --- !u!114 &1998059065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38614,13 +38672,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1536
   lockOnTarget: {fileID: 0}
+  AttackScript: {fileID: 8869352918460668201}
+  inventory: {fileID: 1998059064}
   lockOnCamera: {fileID: 1207364656}
   freeLookCamera: {fileID: 1398122787}
   Reticle: {fileID: 772430619}
-  AttackScript: {fileID: 8869352918460668201}
-  inventory: {fileID: 1998059064}
   WalkDustLeft: {fileID: 1049842738104617}
   WalkDustRight: {fileID: 313876023}
+  climbHeightMaximum: 0.25
+  collisionCheckRange: 0.1
   speed: 1.15
   frontSpeedMultiplier: 2
   horizontalSpeedMultiplier: 1.95
@@ -38631,18 +38691,23 @@ MonoBehaviour:
   turnSmoothTime: 0.075
   turnSmoothVelocity: 0
   lockOnSearchRange: 20
-  climbHeightMaximum: 0.25
   YaxisClimbLerpDelay: 3
   lockOnCameraOffset: 0.1
-  collisionCheckRange: 0.1
+  PickupKey: 102
   Rolling: 32
   LockOn: 325
   CameraSideLeft: 113
   CameraSideRight: 101
   Attack: 323
   WeaponSwitchKey: 114
-  PickupKey: 102
-  animatorSpeedDampDelta: 0
+  orbital:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  rigs:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!65 &1998059066
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -38872,7 +38937,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2085187628}
-  m_LocalRotation: {x: -0.018189492, y: -6.141037e-16, z: -1.0356996e-17, w: 0.9998346}
+  m_LocalRotation: {x: -0.018189492, y: 0.000000001075221, z: 1.9560957e-11, w: 0.9998346}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -49304,8 +49369,8 @@ MonoBehaviour:
   weaponType: 0
   weaponCode: 0
   weaponMass: 1
-  attackDamageMin: 0
-  attackDamageMax: 0
+  attackDamageMin: 100
+  attackDamageMax: 150
   hitFX: {fileID: 1564421980168344, guid: 49c4f7c3ff489ac41bd6e80536ae23c5, type: 3}
 --- !u!23 &3156759736316819722
 MeshRenderer:
@@ -49406,8 +49471,8 @@ MonoBehaviour:
   weaponType: 1
   weaponCode: 0
   weaponMass: 1
-  attackDamageMin: 0
-  attackDamageMax: 0
+  attackDamageMin: 40
+  attackDamageMax: 65
   hitFX: {fileID: 4936541700553400696, guid: cabdaee114909044e864dd0dd20434b8, type: 3}
 --- !u!4 &3430335665106892131
 Transform:
@@ -49658,8 +49723,8 @@ MonoBehaviour:
   weaponType: 1
   weaponCode: 0
   weaponMass: 1
-  attackDamageMin: 0
-  attackDamageMax: 0
+  attackDamageMin: 10
+  attackDamageMax: 15
   hitFX: {fileID: 5988963338039584524, guid: 2105e52b9d1c62146bd5e47568581b5a, type: 3}
 --- !u!23 &4178886649396996639
 MeshRenderer:

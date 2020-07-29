@@ -5,12 +5,23 @@ using UnityEngine;
 public class EnemyProperties : MonoBehaviour
 {
     [Header("Object Reference")]
-    public GameObject hpbar;
-    public Rigidbody rigidbody;
-    public Collider collider;
+    [SerializeField]
+    private GameObject hpbar;
+    [SerializeField]
+    private Rigidbody rigidbody;
+    [SerializeField]
+    private Collider triggerCollider;
+    [SerializeField]
+    private Transform hpBarRoot;
+    [SerializeField]
+    private EnemyAnimation animationController;
+    [SerializeField]
+    private GameObject model;
 
     [Header("General Properties")]
     public string enemyName;
+    public Gradient hpBarColor;
+    public Color hpBarFollowColor;
 
     [Header("Float Properties")]
     public float speed = 0.001f;
@@ -19,10 +30,19 @@ public class EnemyProperties : MonoBehaviour
     public float turnSmoothTime = 0.01f;
     public float turnSmoothVelocity;
     public float hitpoint = 1.0f;
-    [Range(0.0f, 0.5f)]
+    [Range(-1.0f, 1.0f)]
     public float hpBarOffset = 0.0f;
 
+    //delegates
+    public delegate void EnemySpecificFuntion();
+    public EnemySpecificFuntion func;
+
     //private
+    [HideInInspector]
+    private float hpBarDisplaySpeed = 0.09f;
+    private float hpBarDisplayTime = 3.5f;
+    private float hpBarLengthFormula = 4.26603870577f; // this is the best balance I found and not thinking to modifiy it anyway.
+    private float hpBarFillDamping;
     private GameObject hpbarHandle;
     private Camera cam;
     private float hpcurrent;
@@ -38,18 +58,61 @@ public class EnemyProperties : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rigidbody.velocity = Vector3.zero;
+        //rigidbody.velocity = Vector3.zero;
         if (hpbarHandle != null)
         {
             //update hp bar position
-            Vector3 barPos = transform.position;
-            barPos.y += (collider.bounds.size.y / 2f) + hpBarOffset;
+            Vector3 barPos = hpBarRoot.position;
+            barPos.y += hpBarOffset;
+
+            Vector3 viewPos = cam.WorldToViewportPoint(barPos);
+            //Debug.Log(viewPos.y);
+            Debug.DrawLine(hpBarRoot.position, barPos, Color.red);
+            Debug.DrawLine(barPos, barPos + Vector3.right  * 0.1f, Color.red);
+
             hpbarHandle.transform.position = cam.WorldToScreenPoint(barPos);
+            // make sure it wont go out of camera screen border if this enemy is in screen
+            //if (IsObjectInSight(transform, cam))
+            //{
+            //    //Debug.Log(cam.WorldToViewportPoint(barPos).y);
+            //    if (cam.WorldToScreenPoint(hpbarHandle.transform.position).y >= 1f)
+            //    {
+                    
+            //    }
+            //}
+
+            var canvas = hpbarHandle.GetComponent<CanvasProperties>();
+            canvas.SetProgressorColor(0, hpBarColor, hpcurrent / hitpoint);
+            canvas.SetProgressor(0, hpcurrent / hitpoint);
+            canvas.SetProgressor(1, Mathf.MoveTowards(canvas.GetProgressor(1), hpcurrent / hitpoint, 0.25f * Time.deltaTime));
         }
     }
 
     public void TakeDamage(float damage)
     {
+        hpcurrent = Mathf.Clamp(hpcurrent - damage, 0.0f, hitpoint);
+
+        if (hpcurrent == 0)
+        {
+            // remove its collider so the enemy won't got hit again
+            triggerCollider.enabled = false;
+
+            // tell the animator controller this unit is death
+            animationController.Death();
+
+            // Add different collider
+            rigidbody.isKinematic = true;
+
+            // Death specific function
+            if (func != null)
+            {
+                func();
+            }
+
+            // if the enemy is already death, there is no point going further. this function end here.
+            return;
+        }
+
         if (hpbarHandle == null)
         {
             //instiate prefab
@@ -58,19 +121,33 @@ public class EnemyProperties : MonoBehaviour
             hpbarHandle.SetActive(true);
             //set position
             Vector3 barPos = transform.position;
-            barPos.y += (collider.bounds.size.y / 2f) + hpBarOffset;
+            barPos.y += hpBarOffset;
             hpbarHandle.transform.position = cam.WorldToScreenPoint(barPos);
             hpbarHandle.GetComponent<CanvasProperties>().SetTextMesh(0, enemyName);
-            hpbarHandle.GetComponent<CanvasProperties>().SetAlpha(1.0f, 0.09f, 3.5f);
+            hpbarHandle.GetComponent<CanvasProperties>().SetAlpha(0.85f, hpBarDisplaySpeed, hpBarDisplayTime);
+            hpbarHandle.GetComponent<CanvasProperties>().SetProgressorColor(1, hpBarFollowColor);
+            hpbarHandle.GetComponent<CanvasProperties>().SetScaleX(triggerCollider.bounds.size.x * hpBarLengthFormula);
         }
         else
         {
-            hpbarHandle.GetComponent<CanvasProperties>().SetAlpha(1.0f, 0.09f, 3.5f);
+            hpbarHandle.GetComponent<CanvasProperties>().SetAlpha(0.85f, hpBarDisplaySpeed, hpBarDisplayTime);
         }
     }
 
     public float GetCurrentHitPoint()
     {
         return hpcurrent;
+    }
+
+    private bool IsObjectInSight(Transform transform, Camera cam)
+    {
+        Vector3 viewPos = cam.WorldToViewportPoint(transform.position);
+        if (viewPos.x >= 0 && viewPos.x <= 1
+            && viewPos.y >= 0 && viewPos.y <= 1
+            && viewPos.z > 0)
+        {
+            return true;
+        }
+        return false;
     }
 }

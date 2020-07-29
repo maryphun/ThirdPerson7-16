@@ -7,9 +7,16 @@ public class CharacterInventory : MonoBehaviour
     [Header("RequiredObject")]
     public GameObject Canvas;
     public ThirdPersonControl controller;
+    [Range(0.0f, 1.0f)]
+    public float itemNameDisplayAlpha = 0.8f;
+    [Range(0.0f, 0.1f)]
+    public float itemNameDisplaySpeed = 0.05f;
+    [Range(0.0f, 10.0f)]
+    public float tossItemForce = 5.00f;
 
     [HideInInspector]
     public bool itemNearby;
+    public float itemDistanceCompareMax = 1000.0f;
     List<GameObject> nearbyItemList = new List<GameObject>();
     GameObject showItem;
 
@@ -52,7 +59,7 @@ public class CharacterInventory : MonoBehaviour
     private void Update()
     {
         //the update function should only called when there are multiple item in the list
-        float distanceCompare = 1000f;
+        float distanceCompare = itemDistanceCompareMax;
         foreach (GameObject item in nearbyItemList)
         {
             //get the nearest item
@@ -80,7 +87,7 @@ public class CharacterInventory : MonoBehaviour
         if (properties != null)
         {
             Canvas.GetComponent<CanvasProperties>().SetTextMesh(0, showItem.GetComponent<ItemProperties>().itemName);
-            Canvas.GetComponent<CanvasProperties>().SetAlpha(0.8f, 0.05f);
+            Canvas.GetComponent<CanvasProperties>().SetAlpha(itemNameDisplayAlpha, itemNameDisplaySpeed);
             Canvas.GetComponent<CanvasProperties>().SetTextColor(0, showItem.GetComponent<ItemProperties>().textColor);
             Canvas.GetComponent<CanvasProperties>().SetTextMesh(1, controller.PickupKey.ToString());
         }
@@ -91,7 +98,7 @@ public class CharacterInventory : MonoBehaviour
         ItemProperties properties = showItem.GetComponent<ItemProperties>();
         if (properties != null)
         {
-            Canvas.GetComponent<CanvasProperties>().SetAlpha(0.0f, 0.05f);
+            Canvas.GetComponent<CanvasProperties>().SetAlpha(0.0f, itemNameDisplaySpeed);
         }
     }
 
@@ -122,14 +129,13 @@ public class CharacterInventory : MonoBehaviour
                 PickingItem(showItem);
                 // reset tranform
                 showItem.transform.position = new Vector3(transform.position.x, 
-                    controller.AttackScript.secondWeaponParent.transform.position.y + 0.5f, 
-                    transform.position.z);
-                // toss it to with a random force
+                                                          controller.AttackScript.secondWeaponParent.transform.position.y + 0.5f, 
+                                                          transform.position.z);
+                // toss it to a random direction with constant force apply
                 Vector3 torque;
-                float range = 5f;
-                torque.x = (Random.Range(0, 2) * 2 - 1) * range;
+                torque.x = (Random.Range(0, 2) * 2 - 1) * tossItemForce;
                 torque.y = Random.Range(4, 5);
-                torque.z = (Random.Range(0, 2) * 2 - 1) * range;
+                torque.z = (Random.Range(0, 2) * 2 - 1) * tossItemForce;
                 showItem.GetComponent<Rigidbody>().AddForce(torque, ForceMode.Impulse);
             }
         }

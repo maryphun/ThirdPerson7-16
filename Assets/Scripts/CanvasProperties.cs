@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class CanvasProperties : MonoBehaviour
 {
-    [Range(0.0f, 1.0f)]
-    public float aValue = 1;
+    [Range(0.0f, 1.0f), SerializeField]
+    private float aValue = 1;
 
-    public CanvasGroup trans;
+    [Header("Canvas Component Setup"), SerializeField]
+    private CanvasGroup trans;
     public TextMeshProUGUI[] textmesh;
+    public Image[] progressor;
 
     private float originalAlpha;
     private float targetAlpha;
@@ -20,7 +23,6 @@ public class CanvasProperties : MonoBehaviour
     void Start()
     {
         trans.alpha = aValue;
-        enabled = false;
     }
 
     private void Update()
@@ -30,6 +32,7 @@ public class CanvasProperties : MonoBehaviour
         {
             lerp += lerpRate;
             trans.alpha = Mathf.Lerp(originalAlpha, targetAlpha, lerp);
+            Debug.Log(lerp);
         }
     }
 
@@ -58,10 +61,56 @@ public class CanvasProperties : MonoBehaviour
     {
         textmesh[index].SetText(text);
     }
-
+    
     public void SetTextColor(int index, Color newcolor)
     {
         textmesh[index].color = newcolor;
+    }
+
+    public void SetProgressor(int index, float targetFillAmount)
+    {
+        progressor[index].fillAmount = targetFillAmount;
+    }
+
+    public float GetProgressor(int index)
+    {
+        return progressor[index].fillAmount;
+    }
+
+    public void SetProgressorColor(int index, Gradient gradientcolor, float point)
+    {
+        progressor[index].color = gradientcolor.Evaluate(point);
+    }
+
+    public void SetProgressorColor(int index, Color newcolor)
+    {
+        progressor[index].color = newcolor;
+    }
+
+    public void SetScale(Vector3 scale)
+    {
+        var target = transform.GetChild(0).GetComponent<RectTransform>();
+        if (target != null)
+        {
+            target.localScale = scale;
+        }
+        else
+        {
+            Debug.LogWarning("Script trying to access something null, which shouldn't ever happen!");
+        }
+    }
+
+    public void SetScaleX(float newX)
+    {
+        var target = transform.GetChild(0).GetComponent<RectTransform>();
+        if (target != null)
+        {
+            target.localScale = new Vector3(newX, target.localScale.y, target.localScale.z);
+        }
+        else
+        {
+            Debug.LogWarning("Script trying to access something null, which shouldn't ever happen!");
+        }
     }
 
     private IEnumerator DelayFadeOut(float waitTime)
