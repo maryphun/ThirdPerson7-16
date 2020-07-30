@@ -996,7 +996,7 @@ MonoBehaviour:
   animationTransmitionRate: 5
   turnSmoothTime: 0.01
   turnSmoothVelocity: 0
-  hitpoint: 1000
+  hitpoint: 1
   hpBarOffset: 0.3
 --- !u!65 &236087058
 BoxCollider:
@@ -1061,6 +1061,8 @@ MonoBehaviour:
   - {fileID: 1705525746}
   - {fileID: 1911812832}
   delay: 6.5
+  control: 0
+  renderer: {fileID: 1471157764}
 --- !u!1001 &236157709
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19597,7 +19599,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: -0.018189494, y: 0.000000002150442, z: 3.912192e-11, w: 0.9998346}
+  m_LocalRotation: {x: -0.018189494, y: -0.000000002150442, z: -3.912192e-11, w: 0.9998346}
   m_LocalPosition: {x: 28.05, y: 10.074, z: -31.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -21402,7 +21404,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1372929775}
-  m_LocalRotation: {x: -0.03632495, y: 1e-45, z: -0, w: 0.99934006}
+  m_LocalRotation: {x: -0.03632495, y: -1e-45, z: -0, w: 0.99934006}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -38937,7 +38939,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2085187628}
-  m_LocalRotation: {x: -0.018189492, y: 0.000000001075221, z: 1.9560957e-11, w: 0.9998346}
+  m_LocalRotation: {x: -0.018189492, y: -0.000000001075221, z: -1.9560957e-11, w: 0.9998346}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
