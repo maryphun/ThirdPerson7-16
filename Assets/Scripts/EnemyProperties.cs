@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyProperties : MonoBehaviour
 {
@@ -61,27 +62,24 @@ public class EnemyProperties : MonoBehaviour
         //rigidbody.velocity = Vector3.zero;
         if (hpbarHandle != null)
         {
+            var canvas = hpbarHandle.GetComponent<CanvasProperties>();
+            
             //update hp bar position
             Vector3 barPos = hpBarRoot.position;
             barPos.y += hpBarOffset;
 
             Vector3 viewPos = cam.WorldToViewportPoint(barPos);
-            //Debug.Log(viewPos.y);
-            Debug.DrawLine(hpBarRoot.position, barPos, Color.red);
-            Debug.DrawLine(barPos, barPos + Vector3.right  * 0.1f, Color.red);
-
+        
             hpbarHandle.transform.position = cam.WorldToScreenPoint(barPos);
             // make sure it wont go out of camera screen border if this enemy is in screen
-            //if (IsObjectInSight(transform, cam))
-            //{
-            //    //Debug.Log(cam.WorldToViewportPoint(barPos).y);
-            //    if (cam.WorldToScreenPoint(hpbarHandle.transform.position).y >= 1f)
-            //    {
-                    
-            //    }
-            //}
-
-            var canvas = hpbarHandle.GetComponent<CanvasProperties>();
+            if (IsObjectInSight(transform, cam) && canvas.GetAlpha() > 0f)
+            {
+                if (cam.WorldToViewportPoint(barPos).y >= 1f)
+                {
+                    float hpbarHeight = (hpbarHandle.transform.GetChild(0).GetComponent<RectTransform>().rect.height);
+                    hpbarHandle.transform.position = new Vector2(hpbarHandle.transform.position.x, Screen.height - hpbarHeight);
+                }
+            }
             canvas.SetProgressorColor(0, hpBarColor, hpcurrent / hitpoint);
             canvas.SetProgressor(0, hpcurrent / hitpoint);
             canvas.SetProgressor(1, Mathf.MoveTowards(canvas.GetProgressor(1), hpcurrent / hitpoint, 0.25f * Time.deltaTime));

@@ -32,7 +32,6 @@ public class CanvasProperties : MonoBehaviour
         {
             lerp += lerpRate;
             trans.alpha = Mathf.Lerp(originalAlpha, targetAlpha, lerp);
-            Debug.Log(lerp);
         }
     }
 
@@ -55,6 +54,11 @@ public class CanvasProperties : MonoBehaviour
         StopAllCoroutines();
         StartCoroutine(coroutine);
         enabled = true;
+    }
+
+    public float GetAlpha()
+    {
+        return trans.alpha;
     }
 
     public void SetTextMesh(int index ,string text)

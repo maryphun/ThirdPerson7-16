@@ -152,21 +152,25 @@ public class ThirdPersonControl : MonoBehaviour
         animator.SetFloat("Vertical", vertical);
         animator.SetFloat("Speed", speed);
         animator.SetBool("Idle", (horizontal == 0 && vertical == 0));
-
-        //rotate
-        if (lockOnMode)
-        {
-            Vector3 targetPostition = new Vector3(lockOnTarget.position.x, this.transform.position.y, lockOnTarget.position.z);
-            transform.DOLookAt(targetPostition, turnSmoothTime);
-        }
-        else
-        {
-            //freelook camera
-            float targetAngle = camera.transform.eulerAngles.y;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.localRotation = Quaternion.Euler(0f, angle, 0f);
-        }
         
+        //rotate
+        if (!isRolling)
+        {
+            if (lockOnMode)
+            {
+                Vector3 targetPostition = new Vector3(lockOnTarget.position.x, this.transform.position.y, lockOnTarget.position.z);
+                transform.DOLookAt(targetPostition, turnSmoothTime);
+            }
+            else
+            {
+                //freelook camera
+                float targetAngle = camera.transform.eulerAngles.y;
+                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+                transform.localRotation = Quaternion.Euler(0f, angle, 0f);
+            }
+
+        }
+
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
         //move
