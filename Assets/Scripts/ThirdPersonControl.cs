@@ -22,9 +22,9 @@ public class ThirdPersonControl : MonoBehaviour
     [SerializeField]
     private GameObject Reticle;
     [SerializeField]
-    private GameObject WalkDustLeft;
+    private ParticleSystem WalkDustLeft;
     [SerializeField]
-    private GameObject WalkDustRight;
+    private ParticleSystem WalkDustRight;
 
     [Header("Float Parameters")]
     public float climbHeightMaximum = 0.25f;
@@ -95,8 +95,8 @@ public class ThirdPersonControl : MonoBehaviour
             orbital[i] = rigs[i].GetCinemachineComponent<CinemachineOrbitalTransposer>();
         }
     }
-    
-    void Update()
+
+    void FixedUpdate()
     {
         moveSpeed = speed; // set to default
 
@@ -144,7 +144,7 @@ public class ThirdPersonControl : MonoBehaviour
         }
         if (Input.GetAxisRaw("Horizontal") != 0 && Input.GetAxisRaw("Vertical") == 0)
         {
-            moveSpeed *= horizontalSpeedMultiplier;
+            moveSpeed *= frontSpeedMultiplier;
         }
 
         //animation parameters
@@ -152,7 +152,7 @@ public class ThirdPersonControl : MonoBehaviour
         animator.SetFloat("Vertical", vertical);
         animator.SetFloat("Speed", speed);
         animator.SetBool("Idle", (horizontal == 0 && vertical == 0));
-        
+
         //rotate
         if (!isRolling)
         {
@@ -174,7 +174,7 @@ public class ThirdPersonControl : MonoBehaviour
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
         //move
-        if ((direction.magnitude >= 0.1f || isRolling) && 
+        if ((direction.magnitude >= 0.1f || isRolling) &&
             (animator.GetCurrentAnimatorStateInfo(0).IsName("Rolling Locomotion") || animator.GetCurrentAnimatorStateInfo(0).IsName("Locomotion")))
         {
             Vector3 moveDirection;
@@ -231,20 +231,20 @@ public class ThirdPersonControl : MonoBehaviour
                     Debug.DrawLine(end, end + Vector3.up * 0.5f, Color.green);
 
                     //dust particle
-                    ParticleSystem.EmissionModule emissionModule = WalkDustLeft.GetComponent<ParticleSystem>().emission;
+                    ParticleSystem.EmissionModule emissionModule = WalkDustLeft.emission;
                     if (!emissionModule.enabled)
                     {
                         emissionModule.enabled = true;
-                        emissionModule = WalkDustRight.GetComponent<ParticleSystem>().emission;
+                        emissionModule = WalkDustRight.emission;
                         emissionModule.enabled = true;
                     }
                 }
             }
         }
-        else if (WalkDustLeft.activeSelf)
+        else if (WalkDustLeft.gameObject.activeSelf)
         {
             //turn off dust particle when you're not walking
-            ParticleSystem.EmissionModule emissionModule = WalkDustLeft.GetComponent<ParticleSystem>().emission;
+            ParticleSystem.EmissionModule emissionModule = WalkDustLeft.emission;
             if (emissionModule.enabled)
             {
                 emissionModule.enabled = false;
@@ -253,6 +253,7 @@ public class ThirdPersonControl : MonoBehaviour
             }
         }
     }
+    
 
     Transform FindTarget()
     {
@@ -268,7 +269,7 @@ public class ThirdPersonControl : MonoBehaviour
             foreach (GameObject enemy in enemies)
             {
                 //Check if it's in sight, and not too close to the player
-                if (IsObjectInSight(enemy.transform, camera) && Vector3.Distance(enemy.transform.position, this.transform.position) > speed /2)
+                if (IsObjectInSight(enemy.transform, camera) && Vector3.Distance(enemy.transform.position, this.transform.position) > speed / 2)
                 {
                     enemiesInSight.Add(enemy);
                 }
@@ -366,7 +367,7 @@ public class ThirdPersonControl : MonoBehaviour
         Vector3 origin = transform.position + (moveDirection * range * collisionCheckRange);
         origin += Vector3.up * climbHeightMaximum;
         bool GroundHit = (Physics.Raycast(origin, Vector3.down, out hit, climbHeightMaximum, layerMask));
-        
+
         if (GroundHit)
         {
             Debug.DrawLine(transform.position, new Vector3(hit.point.x, transform.position.y, hit.point.z), Color.cyan, 2f);
@@ -428,12 +429,12 @@ public class ThirdPersonControl : MonoBehaviour
     public bool TooCloseToLockOnTarget(Vector3 newPos)
     {
         bool rtn = false;
-        
+
         if (lockOnMode && lockOnTarget != null)
         {
             float newDistance = Vector3.Distance(newPos, lockOnTarget.position);
             float oldDistance = Vector3.Distance(this.transform.position, lockOnTarget.position);
-            if (newDistance < speed/2f && newDistance < oldDistance && horizontal == 0f)
+            if (newDistance < speed / 2f && newDistance < oldDistance && horizontal == 0f)
             {
                 return true;
             }

@@ -12,6 +12,7 @@ public class MeshColliderAdder : MonoBehaviour
             // Determine if they need a mesh collider
             AddMeshCollider(childObject);
         }
+        Debug.Log("added mesh");
     }
 
     private void AddMeshCollider(Transform target)

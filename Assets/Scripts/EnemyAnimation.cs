@@ -10,13 +10,11 @@ public class EnemyAnimation : MonoBehaviour
 
     [Range(0, 1f)]
     public float distanceToGround;
-
-
-
-    void Update()
-    {
-        animator.SetFloat("speed", 0.0f);
-    }
+    
+    //void Update()
+    //{
+    //    animator.SetFloat("speed", 0.0f);
+    //}
 
     void OnAnimatorIK()
     {
@@ -55,6 +53,7 @@ public class EnemyAnimation : MonoBehaviour
     public void Death()
     {
         animator.SetTrigger("death");
+        animator.SetInteger(EnemyAIManager.Instance().transitionParameter, (int)Transition.DEATH);
         enabled = false;
         solidPhysicalCollider.enabled = false;
     }
