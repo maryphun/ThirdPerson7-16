@@ -40,9 +40,9 @@ public class EnemyProperties : MonoBehaviour
 
     //private
     [HideInInspector]
-    private float hpBarDisplaySpeed = 0.09f;
-    private float hpBarDisplayTime = 3.5f;
-    private float hpBarLengthFormula = 4.26603870577f; // this is the best balance I found and not thinking to modifiy it anyway.
+    private const float hpBarDisplaySpeed = 0.09f;
+    private const float hpBarDisplayTime = 3.5f;
+    private const float hpBarLengthFormula = 4.26603870577f; // this is the best balance I found and not thinking to modifiy it anyway.
     private float hpBarFillDamping;
     private GameObject hpbarHandle;
     private Camera cam;
